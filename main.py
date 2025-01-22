@@ -27,8 +27,24 @@ def iniciar_programa():
 
     except Exception as e:
         print(f"Error al cargar el logo: {e}")
+    func_regresar = None 
 
     def abrir_seccion(seccion):
+        ventana.destroy()
+        if seccion == "Productos":
+            main_productos(func_regresar)
+
+        elif seccion == "Clientes":
+            main_clientes(func_regresar)
+
+        elif seccion == "Facturacion":
+            main_facturacion(func_regresar)
+        
+        elif seccion == "Ventas":
+            main_ventas(func_regresar)
+            
+        else:
+            print("Error, reinicia el programa")
         print(f"Abrir {seccion}")
 
     boton_productos = tk.Button(ventana, text="Abrir Productos", command=lambda: abrir_seccion("Productos"), 
