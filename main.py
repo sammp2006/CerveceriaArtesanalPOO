@@ -27,41 +27,35 @@ def iniciar_programa():
 
     except Exception as e:
         print(f"Error al cargar el logo: {e}")
-    func_regresar = None 
-
+    
     def abrir_seccion(seccion):
         ventana.destroy()
         if seccion == "Productos":
-            main_productos(func_regresar)
+            main_productos(iniciar_programa)
 
         elif seccion == "Clientes":
-            main_clientes(func_regresar)
+            main_clientes(iniciar_programa)
 
         elif seccion == "Facturacion":
-            main_facturacion(func_regresar)
+            main_facturacion(iniciar_programa)
         
         elif seccion == "Ventas":
-            main_ventas(func_regresar)
+            main_ventas(iniciar_programa)
             
         else:
             print("Error, reinicia el programa")
         print(f"Abrir {seccion}")
 
-    boton_productos = tk.Button(ventana, text="Abrir Productos", command=lambda: abrir_seccion("Productos"), 
+    boton_productos = tk.Button(ventana, text="Modulo de Productos", command=lambda: abrir_seccion("Productos"), 
                                 bg="yellow", fg="black", relief="solid", bd=2)
     boton_productos.pack(pady=5, fill="x")
 
-    boton_clientes = tk.Button(ventana, text="Abrir Clientes", command=lambda: abrir_seccion("Clientes"), 
+    boton_clientes = tk.Button(ventana, text="Modulo de Clientes (+ Ventas y Facturacion)", command=lambda: abrir_seccion("Clientes"), 
                                bg="yellow", fg="black", relief="solid", bd=2)
     boton_clientes.pack(pady=5, fill="x")
 
-    boton_ventas = tk.Button(ventana, text="Abrir Ventas", command=lambda: abrir_seccion("Ventas"), 
-                             bg="yellow", fg="black", relief="solid", bd=2)
-    boton_ventas.pack(pady=5, fill="x")
-
-    boton_facturacion = tk.Button(ventana, text="Abrir Facturación", command=lambda: abrir_seccion("Facturación"), 
-                                  bg="yellow", fg="black", relief="solid", bd=2)
-    boton_facturacion.pack(pady=5, fill="x")
+    nota_pie_pagina = tk.Label(ventana, text="Para registrar una venta o facturarla \n primero seleccione el cliente en cuestion", relief="solid", bd=2)
+    nota_pie_pagina.pack(pady=5, fill="x")
 
     boton_cerrar = tk.Button(ventana, text="Cerrar", command=ventana.quit, bg="red", fg="black", relief="solid", bd=2)
     boton_cerrar.pack(pady=10, fill="x")

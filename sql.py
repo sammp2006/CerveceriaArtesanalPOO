@@ -29,6 +29,7 @@ def crear_base_de_datos(conexion, cursor):
             fecha DATETIME,
             producto INTEGER,
             cliente INTEGER,
+            cantidad INTEGER,
             FOREIGN KEY (producto) REFERENCES Productos(noIdProducto),
             FOREIGN KEY (cliente) REFERENCES Clientes(noIdCliente)
         )
@@ -97,7 +98,78 @@ def crear_producto(nombre, medida, fechaVencimiento, precioProduccion, precioVen
         print(e)
         return False
 
+def listar_clientes():
+    conn, cursor = abrir_conexion()
+    cursor.execute("SELECT noIdCliente, nombre, apellido, direccion, telefono, correo FROM Clientes")
+    clientes = cursor.fetchall()
+    conn.close()
+    return clientes
+
+def accion_cliente_detalle(id_cliente):
+    conn, cursor = abrir_conexion()
+    cursor = conn.cursor()
+    cursor.execute("SELECT noIdCliente, nombre, apellido, direccion, telefono, correo FROM Clientes WHERE noIdCliente = ?", (id_cliente,))
+    cliente = cursor.fetchone()
+    conn.close()
+    return cliente
+
+def accion_cliente_cambiar_direccion(nueva_direccion, id_cliente):
+    conn, cursor = abrir_conexion()
+    cursor.execute("UPDATE Clientes SET direccion = ? WHERE noIdCliente = ?", (nueva_direccion, id_cliente))
+    conn.commit()
+    conn.close()
+
+
+def accion_ver_historico_ventas_cliente(id_cliente):
+    conn, cursor = abrir_conexion()
+    cursor.execute('''
+        SELECT noIdVentas, fecha, producto, cantidad FROM Ventas WHERE cliente = ?
+    ''', (id_cliente,))
+    ventas = cursor.fetchall()
+    conn.close()
+    return ventas
+
+def accion_registrar_venta_cliente(fecha_venta, producto_id, id_cliente, cantidad):
+    conn, cursor = abrir_conexion()
+    try:
+        cursor.execute('''
+            INSERT INTO Ventas (fecha, producto, cliente, cantidad)
+            VALUES (?, ?, ?, ?)
+        ''', (fecha_venta, producto_id, id_cliente, cantidad))
+        conn.commit()
+
+        conn.close()
+        return True
     
+    except:
+        return False
+
+def accion_borrar_venta(id_venta):
+    conn, cursor = abrir_conexion()
+    cursor.execute('''
+            DELETE FROM Ventas WHERE noIdVentas = ?
+        ''', (id_venta,))
+    conn.commit()
+    if cursor.rowcount > 0:
+        return True
+    else:
+        False
+
+
+def crear_cliente(nombre, apellido, direccion, telefono, correo):
+    try:
+        conn, cursor = abrir_conexion()
+        cursor.execute('''
+            INSERT INTO Clientes (nombre, apellido, direccion, telefono, correo)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (nombre, apellido, direccion, telefono, correo))
+        conn.commit()
+        conn.close()
+
+        return True
+    except:
+        return False    
+
 if __name__ == "__main__":
     con, cursor = abrir_conexion()
     crear_base_de_datos(con, cursor)
