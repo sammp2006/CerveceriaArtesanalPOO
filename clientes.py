@@ -2,7 +2,7 @@
 import tkinter as tk
 from datetime import datetime
 from tkinter import messagebox
-from sql import crear_cliente, listar_clientes, accion_cliente_detalle, accion_cliente_cambiar_direccion, accion_ver_historico_ventas_cliente, accion_registrar_venta_cliente, accion_borrar_venta
+from sql import obtener_data_factura, crear_cliente, listar_clientes, accion_cliente_detalle, accion_cliente_cambiar_direccion, accion_ver_historico_ventas_cliente, accion_registrar_venta_cliente, accion_borrar_venta
 #crear un nuevo cliente, actualizar su dirección y consultar la información
 #vigente de un cliente.
 
@@ -168,7 +168,8 @@ def boton_ver_historico_ventas(id_cliente):
         return
 
     for venta in ventas:
-        noIdVentas, fecha, producto_id = venta
+        print(venta)
+        noIdVentas, fecha, producto_id = venta[0], venta[1], venta[2]
         
         # Crear un frame para cada venta
         venta_frame = tk.Frame(frame)
@@ -189,17 +190,14 @@ def boton_ver_historico_ventas(id_cliente):
     # Actualizar el tamaño del canvas
     frame.update_idletasks()
     canvas.config(scrollregion=canvas.bbox("all"))
-
+    
     ventana_toplevel.mainloop()
 
 
 def boton_facturar(id_cliente):
-    messagebox.showinfo("PENDIENTE", f"Facturar ventas con cliente ID: {id_cliente}")
+    dicc = obtener_data_factura(id_cliente)
 
-    nombre, apellido, registro ,correo, productos = obtener_data_cliente(id_cliente)
-
-
-    "correo, nombre, "
+    print(dicc)
     # Aquí puedes agregar la lógica para marcar la venta como facturada.
 
 def boton_borrar_venta(id_venta):

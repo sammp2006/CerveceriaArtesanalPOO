@@ -1,4 +1,6 @@
 import sqlite3
+import uuid
+from datetime import datetime
 
 def crear_base_de_datos(conexion, cursor):
 
@@ -128,6 +130,74 @@ def accion_ver_historico_ventas_cliente(id_cliente):
     ventas = cursor.fetchall()
     conn.close()
     return ventas
+
+def obtener_data_factura(id_cliente):
+    conn, cursor = abrir_conexion()
+
+    # Inicializamos el diccionario que tendrá toda la información
+    dicc = {}
+
+    # 1. Obtener los datos del cliente
+    cursor.execute('''
+        SELECT nombre, apellido, direccion, telefono, correo 
+        FROM Clientes WHERE noIdCliente = ?
+    ''', (id_cliente,))
+    cliente_data = cursor.fetchone()
+
+    if cliente_data:
+        dicc["cliente"] = {
+            "id_cliente": id_cliente,
+            "nombre": cliente_data[0],
+            "apellido": cliente_data[1],
+            "direccion": cliente_data[2],
+            "telefono": cliente_data[3],
+            "correo": cliente_data[4]
+        }
+    
+    # 2. Obtener las ventas del cliente
+    cursor.execute('''
+        SELECT V.noIdVentas, V.fecha, V.producto, V.cantidad
+        FROM Ventas V
+        WHERE V.cliente = ?
+    ''', (id_cliente,))
+    ventas_cliente = cursor.fetchall()
+
+    productos = {}
+    precio_total = 0
+
+    for venta in ventas_cliente:
+        noIdVentas, fecha, id_producto, cantidad = venta
+
+        cursor.execute('''
+            SELECT NombreProducto, PrecioVenta
+            FROM Productos
+            WHERE noIdProducto = ?
+        ''', (id_producto,))
+        producto_data = cursor.fetchone()
+
+        if producto_data:
+            nombre_producto, precio_venta = producto_data
+            precio_venta_total = precio_venta * cantidad
+
+            productos[id_producto] = {
+                "nombre": nombre_producto,
+                "precio": precio_venta,
+                "fecha_venta": fecha,
+                "cantidad": cantidad,
+                "total": precio_venta_total
+            }
+
+            precio_total += precio_venta_total
+
+    no_factura = f"{datetime.now().strftime('%Y%m%d%H%M%S')}{id_cliente}{str(uuid.uuid4().int)[:10]}"
+
+    dicc["no_factura"] = no_factura
+    dicc["productos"] = productos
+    dicc["precio_total"] = precio_total
+
+    conn.close()
+
+    return dicc
 
 def accion_registrar_venta_cliente(fecha_venta, producto_id, id_cliente, cantidad):
     conn, cursor = abrir_conexion()
